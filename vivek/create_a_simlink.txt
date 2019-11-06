@@ -1,0 +1,10 @@
+Make a simlink to local version of dataset.
+
+to create a simlink:
+
+	ln -s /path/to/file /path/to/symlink
+
+	
+to update an existing simlink:
+
+	ln -sf /path/to/file /path/to/symlink
