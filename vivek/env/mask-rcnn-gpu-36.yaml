@@ -17,7 +17,7 @@ dependencies:
   - openblas=0.3.7=h6e990d7_3
   - openssl=1.0.2t=h14c3975_0
   - pandas=0.20.3=py34_1
-  - python=3.4.5=2
+  - python=3.6.5
   - python-dateutil=2.8.1=py_0
   - pytz=2019.3=py_0
   - readline=6.2=0
