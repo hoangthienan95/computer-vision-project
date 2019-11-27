@@ -1,9 +1,0 @@
-numpy
-scipy
-cython
-h5py
-Pillow
-scikit-image
-tensorflow-cpu==1.15.0rc3
-keras
-jupyter
