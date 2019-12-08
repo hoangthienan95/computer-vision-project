@@ -4,8 +4,20 @@ import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
 import json
-from tqdm import tqdm as tqdm
+from tqdm import tqdm
 import os
+import skimage
+
+def load_dataset(filepath:str):
+    with open(filepath, 'rb') as f:
+        print(filepath)
+        data = pickle.load(f)
+    return data
+
+def save_dataset(dataset, filepath:str):
+    with open(filepath, 'wb') as f:
+        print(filepath)
+        pickle.dump(dataset, f)
 
 class FashionDataset(utils.Dataset):
     """
@@ -13,23 +25,12 @@ class FashionDataset(utils.Dataset):
     FashionDataset holds data relevant to the imaterialist challenge data.
     """
 
-    # @staticmethod
-    def load(filepath:str):
-        with open(filepath, 'rb') as f:
-            print(filepath)
-            data = pickle.load(f)
-            return data
-
-    def save(self, filepath:str):
-        with open(filepath, 'wb') as f:
-            pickle.dump(self, f)
-
-    def __len__(self):
-        return len(self.image_info)
-
     def __init__(self):
         super(FashionDataset, self).__init__()
         self.class_names= []
+
+    def __len__(self):
+        return len(self.image_info)
 
     def create_classes(self, cat_file:str) -> [dict]:
         """
