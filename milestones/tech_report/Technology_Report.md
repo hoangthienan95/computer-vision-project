@@ -90,6 +90,7 @@ The following figure shows the complete Mask R-CNN structure with the Faster R-C
 #### Convolutional Base
 <br>
 <center>
+
 ![](images/backbone.png) <br>
 **Figure 4**: The encoder part of a pyramid network where each level in the pyramid is a <br> convolution of the previous level increasing the depth but decreasing the x/y dimensions.
 </center>
@@ -101,6 +102,7 @@ If you are unfamiliar with the details of the convolutional layers, refer to the
 
 <br>
 <center>
+
 ![](images/convolutional_demo.gif) <br>
 **Figure 5**: Example of how a convolution is calculated.
 </center>
@@ -115,6 +117,7 @@ We can think of the convolutional base as constructing a pyramid of feature maps
 
 <br>
 <center>
+
 ![](images/fpn_1.jpeg) <br>
 **Figure 6:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image. <br>
 <a href=https://arxiv.org/pdf/1612.03144.pdf>https://arxiv.org/pdf/1612.03144.pdf</a>
@@ -126,6 +129,7 @@ However, computer vision tasks using only the high level feature maps will suffe
 
 <br>
 <center>
+
 ![](images/fpn_2.png) <br>
 **Figure 7:** Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.
 </center>
@@ -138,6 +142,7 @@ Below is the detailed layers for the FPN. For the top-down pathway's M5 layer fo
 
 <br>
 <center>
+
 ![](images/fpn_3.png) <br>
 **Figure 8:** 
 </center>
@@ -153,6 +158,7 @@ Anchors are boxes distributed over the image area. In the Mask-RCNN implementati
 
 <br>
 <center>
+
 ![](images/anchors.png) <br>
 **Figure 9:** An example of anchors of one size in an image. <br>
 <a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46>https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
@@ -169,6 +175,7 @@ The diagram below shows the 8 × 8 feature maps with a 3× 3 filter, and it outp
 
 <br>
 <center>
+
 ![](images/rpn_1.jpeg) <br>
 **Figure 10** : Regions of interest for each point in a feature mapping 
 </center>
@@ -182,6 +189,7 @@ Using 9 anchors per location, it generates 2 × 9 objectness scores and 4 × 9 c
 
 <br>
 <center>
+
 ![](images/rpn_2.png) <br>
 **Figure 11:** Calculation of scores and coordinates for each anchor. <br>
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
@@ -195,6 +203,7 @@ The regression task for bounding box and classification task for "has object or 
 
 <br>
 <center>
+
 ![](images/rpn_3.jpeg) <br>
 **Figure 12:** The decoder uses scores and coordinates to determine classes and bounding boxes. <br>
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
@@ -208,6 +217,7 @@ As described above RPN generate region of interests. We feed **only the lowest-l
 
 <br>
 <center>
+
 ![](images/RPN_FPN.jpeg) <br>
 **Figure 13:** Mask R-CNN inserts an ROI Pooling layer in the model <br> before classification and bounding boxes are calculated. <br>
 <a href=https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c>https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c</a>
