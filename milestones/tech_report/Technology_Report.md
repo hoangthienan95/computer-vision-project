@@ -32,7 +32,7 @@ A brief discussion on the most recent iteration of this infrastructure, YOLACT, 
 Instance segmentation is the task of identifying object outlines at the pixel level. It's one of the most difficult tasks in computer vision. Instance segmentation is challenging because it requires
 the correct detection of all objects in an image while also precisely segmenting each instance. The image below illustrates the differences between the different computer vision tasks
 
-
+<br>
 <center>
 
 ![](images/compare_computer_vision_tasks.png)
@@ -50,7 +50,8 @@ Instance segmentation, therefore, combines elements from the classical computer 
 Mask R-CNN is the evolution of not a segmentation architecture, but rather the RCNN object detection architecure.  The timeline below shows the quick progress in which an optimized version of the R-CNN object detection architecture in 2014 developed into the instance segmentation architecture of Mask R-CNN in 2018.  In 2019, Mask R-CNN was refined by the YOLACT instrastructure which dramatically improved inference time allowing real-time segmenation of images, albeit with lower accuracy.
 
 <br>
-<center>  
+<center>
+  
 ![](images/Mask_RCNN_evolution.png)
 **Figure 2**: Mask R-CNN is an iterative evolution of the original R-CNN structure.  YOLACT has recently been developed adding real-time inference to instance segmentaiton tasks.
 </center>
@@ -61,6 +62,7 @@ The following figure shows the complete Mask R-CNN structure with the Faster R-C
 
 <br>
 <center>
+
 ![](images/Mask_RCNN_structure.png)
 **Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
 (Source image from <a href=https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272>https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272</a>)
