@@ -283,7 +283,7 @@ As YOLACT was published during our initial project, only one stable implementati
 ## 5. Lessons Learned / Improvements
 <a href=#toc>back to table of contents</a><br>
 
-* Starting with a pre-created impleentation of an architecture is imperative.  
+* Starting with a pre-created implementation of an architecture is imperative.  
 
 <a name=sec6></a>
 ## 6. Conclusion
