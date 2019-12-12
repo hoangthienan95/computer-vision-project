@@ -32,8 +32,6 @@ A brief discussion on the most recent iteration of this infrastructure, YOLACT, 
 Instance segmentation is the task of identifying object outlines at the pixel level. It's one of the most difficult tasks in computer vision. Instance segmentation is challenging because it requires
 the correct detection of all objects in an image while also precisely segmenting each instance. The image below illustrates the differences between the different computer vision tasks
 
-<br>
-![](images/compare_computer_vision_tasks.png)
 
 <center>
 ![](images/compare_computer_vision_tasks.png)
