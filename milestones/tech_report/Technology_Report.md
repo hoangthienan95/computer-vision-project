@@ -35,7 +35,7 @@ the correct detection of all objects in an image while also precisely segmenting
 
 <br>
 <center>
-##**Segmentation Types**
+**Segmentation Types**
 ![](images/compare_computer_vision_tasks.png)
 **Figure 1**: Types of Object detection and segmenation <a href=http://cs231n.github.io/transfer-learning>(http://cs231n.github.io/transfer-learning)</a> <br>
 </center>
