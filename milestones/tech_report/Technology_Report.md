@@ -58,14 +58,20 @@ Mask R-CNN is the evolution of not a segmentation architecture, but rather the R
 <br>
 
 ### Mask R-CNN Architecture
-The following figure shows the complete Mask R-CNN structure with the Faster R-CNN base in order to show how Mask R-CNN fits into the evolution.  Mask R-CNN (regional convolutional neural network) is a two stage framework: the first stage scans the image and generates proposals(areas likely to contain an object). And the second stage classifies the proposals and generates bounding boxes and masks.
+The following figure shows the complete Mask R-CNN structure with the Faster R-CNN base separated out.  This shows how Mask R-CNN fits into the R-CNN evolution.  Mask R-CNN (regional convolutional neural network) is a two stage framework: 
+1. Stage 1 scans the image and generates proposals(areas likely to contain an object) using a Regiona Proposal Network. 
+2. Stage 2 classifies the proposals and generates bounding boxes and masks.
+
+Mask R-CNN contributes to the second stage of this process by creating masks from the Faster R-CNN's Regional Proposal Outputs.
 
 <br>
 <center>
-
+<font size="+2">**Mask R-CNN Architecture**</font>
 ![](images/Mask_RCNN_structure.png)
+<font size="-2">
 **Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
 (Source image from <a href=https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272>https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272</a>)
+</font>
 </center>
 <br>
 
