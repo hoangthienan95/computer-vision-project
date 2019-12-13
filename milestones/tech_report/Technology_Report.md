@@ -35,14 +35,9 @@ Instance segmentation is the task of identifying object outlines at the pixel le
 <br>
 
 
-
-
-
-<center> 
-
 ![](images/compare_computer_vision_tasks.png)
 **Figure 1**: Types of Object detection and segmenation <a href=http://cs231n.github.io/transfer-learning>(http://cs231n.github.io/transfer-learning)</a> <br>
- </center>
+</center>
 
 <br>
 
