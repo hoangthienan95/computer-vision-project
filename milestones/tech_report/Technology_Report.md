@@ -4,13 +4,14 @@
 - - -
 Recently, computer vision applications have attracted significant attention in the fashion domain. A historically challenging task has been to build an intelligent recommender system that can suggest items for purchase, based on a semantically rich notion of “personalized style”. Despite the seemingly insurmountable complexity of this task, the lucrative end reward has enticed e-commerce behemoths like Amazon [1], Stitch Fix, and Pinterest [2] to participate in a race to develop recommender systems that can understand notions of style.
 
-A recent paper describes a system that can take in “in the wild” scene images to generate complementary items recommendations [4]. However, their model training involves inefficient cropping heuristics that fail on certain clothing items, complicated attention mechanisms to detect each item of clothing in an image, and a manually-curated dataset. The authors remark that constructing appropriate ground truth data to learn the notion of compatibility is a significant challenge due to the amount of human effort to label and categorize.  
+A recent paper describes a system that can take in “in the wild” scene images to generate complementary items recommendations [4]. However, their model training involves inefficient cropping heuristics that fail on certain clothing items, complicated attention mechanisms to detect each item of clothing in an image, and a manually-curated dataset. The authors remark that constructing appropriate ground truth data to learn the notion of compatibility is a significant challenge due to the amount of human effort to label and categorize.
 
 The effort described in this paper aims to use existing methods to provide a quality instances segmentaiton of fashion items and their attributes using data provided from the 2019 Kaggle iMaterialist [6][7] challenge.
 
 This effort focuses on the implementation of a Mask RCNN model and covers the major components of this framework that deliver a state-of-the-art semantic segmentation.  The Matterport implementation of Mask R-CNN [] is used as a supporting framework to implement the model into which the iMaterialist data is loaded and trained.
 
 A brief discussion on the most recent iteration of this infrastructure, YOLACT, is reviewed where real-time segmentaiton has become a reality.
+
 - - -
 
 <a name=toc></a>
@@ -34,7 +35,7 @@ the correct detection of all objects in an image while also precisely segmenting
 
 <br>
 <center>
-
+##**Segmentation Types**
 ![](images/compare_computer_vision_tasks.png)
 **Figure 1**: Types of Object detection and segmenation <a href=http://cs231n.github.io/transfer-learning>(http://cs231n.github.io/transfer-learning)</a> <br>
 </center>
@@ -66,7 +67,7 @@ Mask R-CNN contributes to the second stage of this process by creating masks fro
 
 <br>
 <center>
-<font size="+2">**Mask R-CNN Architecture**</font>
+**Mask R-CNN Architecture**
 ![](images/Mask_RCNN_structure.png)
 <font size="-2">
 **Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
