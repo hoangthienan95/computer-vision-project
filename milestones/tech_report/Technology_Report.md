@@ -36,11 +36,12 @@ Instance segmentation is the task of identifying object outlines at the pixel le
 
 
 
-<center>
 
-![](images/compare_computer_vision_tasks.png)
+
+<center> ![](images/compare_computer_vision_tasks.png) </center>
+
 **Figure 1**: Types of Object detection and segmenation <a href=http://cs231n.github.io/transfer-learning>(http://cs231n.github.io/transfer-learning)</a> <br>
-</center>
+
 <br>
 
 Instance segmentation, therefore, combines elements from the classical computer vision tasks of object detection, where the goal is to classify individual objects and localize each using a bounding box, and semantic segmentation, where the goal is to classify each pixel into a fixed set of categories without differentiating object instances.
