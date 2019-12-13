@@ -66,7 +66,9 @@ Mask R-CNN contributes to the second stage of this process by creating masks fro
 
 <br>
 <center>
+
 **Mask R-CNN Architecture**
+
 ![](images/Mask_RCNN_structure.png)
 <font size="-2">
 **Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
