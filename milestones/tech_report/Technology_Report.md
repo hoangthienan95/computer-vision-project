@@ -18,12 +18,13 @@ A brief discussion on the most recent iteration of this infrastructure, YOLACT, 
 ## Table of Contents
 
 1. <a href=#sec1>Instance Segmentation Overview</a>
-2. <a href=#sec2>Mask R-CNN Explained</a>
-3. <a href=#sec3>Implementation</a>
-4. <a href=#sec4>Other Models</a>
-5. <a href=#sec5>Lessons Learned / Improvements</a>
-6. <a href=#sec6>Conclusion</a>
-7. <a href=#sec7>References</a>
+2. <a href=#sec2>Related Work</a>
+3. <a href=#sec3>Mask R-CNN Explained</a>
+4. <a href=#sec4>Implementation</a>
+5. <a href=#sec5>Other Models</a>
+6. <a href=#sec6>Lessons Learned / Improvements</a>
+7. <a href=#sec7>Conclusion</a>
+8. <a href=#sec8>References</a>
 
 - - -
 
@@ -42,8 +43,17 @@ Instance segmentation is the task of identifying object outlines at the pixel le
 <br>
 
 Semantic segmentation has the goal of classify each pixel into a fixed set of categories without differentiating object instances.  Instance segmentation expands on elements from the classical computer vision tasks of object detection but segmenting pixels within each localized bounding box.  
+
 <a name=sec2></a>
-## 2. Mask R-CNN Explained
+## 2. Related Work
+<a href=#toc>back to table of contents</a><br>
+Object detection has become a primary focus of computer vision tasks over recent years.  In 2015, FaceBook Research introduced DeepMask which was a pioneering effort into instance segmentation.  At the same time, the R-CNN family of object detection architectures were under going a series of iterative improvements with the publication of Fast R-CNN and Faster-RCNN.  The architecture of DeepMask focused on segmenation first and then identifiction which led to a slow training and slow inference as well as a high rate of misclassifications.  Mask R-CNN performs the same task as DeepMask but does so in parallel to the classification task improving both speed and accuracy.
+
+This paper focuses on how Mask R-CNN works and its evolution.
+
+
+<a name=sec3></a>
+## 3. Mask R-CNN Explained
 <a href=#toc>back to table of contents</a><br>
 
 ### Evolution of Mask R-CNN
@@ -254,7 +264,7 @@ The formula to pick the feature maps is based on the width w and height h of the
 
 where k0 is a user-defined parameter (default: 4), and k is the layer in the FPN to be used for the feature patch. So if k = 3, we select P3 for the patch for that ROI.
 
-<a name=sec3></a>
+
 
 
 #### ROI Align
@@ -270,8 +280,8 @@ The next phase is the contribution made my the Mask R-CNN architecture.  Chosen 
 Each branch produces a unique output.
 
 
-
-## 3. Implementation
+<a name=sec4></a>
+## 4. Implementation
 <a href=#toc>back to table of contents</a><br>
 
 In order to demonstrate Mask R-CNN the Matterport implementation was used.  This provided a structure into which the iMaterialist Kaggle data could be loaded and trained.
@@ -288,8 +298,8 @@ We trained the dataset using an <NVIDIA 16GB EGPU> and still needed to limit bat
 
 BACKBONE: resnet50
 
-<a name=sec4></a>
-## 4. Other Models
+<a name=sec5></a>
+## 5. Other Models
 <a href=#toc>back to table of contents</a><br>
 
 In order to extend our dataset to other models, we made attempts to train a UNET and YOLACT model in order to compare and contrast with Mask RCNN.  Unfortuntately, this proved more challenging than expected:
@@ -315,19 +325,19 @@ As YOLACT was published during our initial project, only one stable implementati
 (<a href=https://github.com/dbolya/yolact>https://github.com/dbolya/yolact</a>)
 
 
-<a name=sec5></a>
-## 5. Lessons Learned / Improvements
+<a name=sec6></a>
+## 6. Lessons Learned / Improvements
 <a href=#toc>back to table of contents</a><br>
 
 * Starting with a pre-created implementation of an architecture is imperative.  
 
-<a name=sec6></a>
-## 6. Conclusion
+<a name=sec7></a>
+## 7. Conclusion
 <a href=#toc>back to table of contents</a><br>
 
 
-<a name=sec7>
-## 7. References
+<a name=sec8>
+## 8. References
 <a href=#toc>back to table of contents</a><br>
 
 [1]  Krishnan, A. (2019, June 19). StyleSnap will change the way you shop, forever. Retrieved from aboutamazon.com <br>
