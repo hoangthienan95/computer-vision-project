@@ -286,19 +286,236 @@ Each branch produces a unique output.
 ## 4. Implementation
 <a href=#toc>back to table of contents</a><br>
 
-In order to demonstrate Mask R-CNN the Matterport implementation was used.  This provided a structure into which the iMaterialist Kaggle data could be loaded and trained.
+In this project, we utilized an open-source implementation of Mask R-CNN model provided by Matterport[12] and applied it on the recently release iMaterialist Dataset[7] which focuses on clothing apparels and attributes in scene-based images. We apply the Mask R-CNN model that was initially trained on the COCO dataset and fine-tune it for the iMaterialist Dataset images to obtain instance-level segmentation outputs. 
 
-### Data Preparation / EDA
-The Kaggle data consists of 46715 labeled training images and 3201 unlabeled test images.  Labels are encoded pixel masks saved in a training Excel spreadsheet that included image filename, the encoded mask and the class in the mask.
+Training was achieved in multiple runs with each run tuning the Mask R-CNN hyperparameters and/or the dataset with difference strategries to achieve the lowest model losses. We complete four runs of training hereby referred to as **Baseline, Run 1, Run 2,Run 3**
 
-Data from the Excel sheet was extracted and loaded into a Dataset class provided by the Matterport implementation.  The Dataset class provides a structure to hold references to images and masks as well as a variety of methods which are used to handle images and masks during training and inference.  Using this Dataset class enabled seamless training using the Mask R-CNN structure supported by the Matterport implementation.
+### Dataset
+The iMaterialist Dataset[7] is a rich dataset consiting of ~45k unique training images with over ~330k unique pixel-wise instance-level annotations, where each annotation represents an instance of a segmented clothing apparel in the image e.g. shirt, top, skirt, shoe, etc. The dataset also consists of ~3k unlabeled test images for the purposes of the online competition discussed below.
 
-Upon inspection, we found the data to be clean with no requirements to remove images or resolve naming conflicts.
+The Dataset is presented as a set of JPEG images of varied dimensions and single CSV database file listing out the pixel-wise annotations for each image. The CSV file provides key attributes for each image including Image ID, Annotation Mask encoded in Run-Length Encoding(RLE), Image Dimensions and the Class ID for each annotation. Overall, the Dataset contains annotations spanning 46 unique categories of clothing apparels. It is important to note that in the original Dataset, the Class ID is obtained by concatenating both segmented apparel object index and predicted attributes' indices for this object. 
+e.g 6_28_77 → Category: Pants(6) ; Attributes: Bell(28), Leopard(77). The fine-grained attributes add an additional level of complexity to an already ambitious segmentation task, hence, for the purposes of this project we discarded all fine-grained attributes from the annotation and only focused on the 46 primary apparel categories. Using the example above, the Class ID for the annotation above (6_28_77) would be read as Category: Pants (6) with the attributes disarded prior to training. 
 
-### Results
-We trained the dataset using an <NVIDIA 16GB EGPU> and still needed to limit batch sizes to prevent memory faults.  The images below are the r
+Compared to the COCO Dataset, the iMaterialist Dataset is closer to a real-world application with a variety of objects resembling clothing apparels. The iMaterialist also boasts of a much better labeling quality and is more fine-grained, so the general contour of the objects are preserved much better. This requires our training model to be more robust to learn the fine-grained labeling and tolerate diversity in categories.
 
-BACKBONE: resnet50
+The iMaterialist Dataset was presented as an open online challenge on Kaggle. The challenge submissions were evaluated on the basis of segmenting fine-grained clothing apparels on a set of ~3k test images. There is no published literature introducing the usage or implementation on the data quality because of the novelty of the iMaterialist dataset. The online challenge ended in June 2019 with over 241 submissions ranging from a wide variety of implementations using pre-trained and novel instance segmentation frameworks. At the close of the competition, the mean average precision (mAP) for all submissions remained low with the highest precision reported at **0.32**. 
+
+### Exploratory Data Analysis
+We started the segmentation task by taking a deep dive into the iMaterialist Dataset using the base set of files provided as part of the Dataset packages. The crux of the information is provided in the CSV database file listing out the pixel-wise annotations for each image.
+
+<br>
+<center>
+
+![](images/Dataframe_sample.png)<br>
+**Figure 14:** *(Left)*Sample dataframe from iMaterialist Train CSV file,*(Right)*Corresponding image with annotations overlaid<br>
+</center>
+<br>
+The database consists of **45625** unique training image filenames with a total of **333415** pixel-wise annotations. The maximum number of ground truth annotations for a given image is **74** with the average number of annotations per image is roughly around **7.3**.
+
+With regards to the apparel categories, the database has annotations for **46** unique apparel categories, however, the number of annotations per category does not follow a uniform distribution. In actuality, there is a huge disparity in number of annotations per category as depicted in ***Figure 15***. The maximum number of annotations for a given category is **59452(sleeve)** and the minimum number of annotations for a given category is **112 (leg warmer)** with median number of annotations being close to **3212**. It is important to note here that even with the disparity in representation of each category, the prime categories of apparels e.g. shirt, jacket, pants, jackets, shoe, dress and fairly well represented in the dataset.
+
+In addition, there is also a wide distribution in the dimensions of the training images with the **(10717,6824)** and **(236, 304)** being the maximum and minimum dimensions(W,H) respectively. 
+
+<p float="center">
+  <img src="images/Categories_distribution.png" width="800"/> 
+</p>
+
+<center>
+**Figure 15:** Distribution of annotations per apparel category <br>
+</center>
+
+<br>
+As mentioned above, the dataset also consisted about **3201** test images for the purposes of the online competition which did not containg corresponding annotation labels, as a result we did not use those images in any capacity for the purposes of this project.
+
+<p float="center">
+  <img src="images/Sample_images.png" width="800"/> 
+</p>
+
+<center>
+**Figure 16:** Set of sample images from training dataset with masks overlaid<br>   
+</center>
+<br>
+
+### Data Preparation and pre-processing
+For the purposes of training, the iMaterialist Dataset had to be converted from its native format into a COCO-style database format for training with the Mask R-CNN model. Mask R-CNN provides a robust set of API to assist in this data generation task. The details of the this data generation exercise is documented well in our code base, we discuss a few high-level details here.
+
+The COCO-style dataset expects the data to be provided as a Python class objects which extends the `utils::Dataset` class. The class object at a high-level maintains a reference to the entire dataset as a dictionary of images with the following minimum set of fields
+```
+dict (
+    “source”: <source_id>,
+    “id”: <image_id>,
+    “path”: <filepath>,
+    “width”: <width>,
+    “height”: <height>,
+    “annotations”: = dict(
+        “mask”: <binary_or_rle_masks>,
+        “class_id”: <class_ids>,
+        “iscrowd”: <binary_or_rle_flag> 
+))
+```   
+
+We then overload the `load_images()` and `load_mask()` methods in the `utils::Dataset` class to finalize the creation of our custom dataset object.
+
+Once loaded into the COCO-style format, the images, annotations and bounding boxes become much easier to manipulate and visualize as seen from some of the examples provided below.
+
+<p float="center">
+    <img src="images/samples_image_coco.png" width="300"/>
+    <img src="images/samples_image_w_masks_coco.png" width="500" align="top"/> 
+</p>
+
+<center>
+**Figure 17:** Set of sample images from training dataset in COCO-style format<br>
+</center>
+<br>
+
+We did not apply any further pre-processing steps to the dataset or to the images prior to training. By default, Mask R-CNN model resizes all input images to a fixed size of *1024 px x 1024 px*. The non-square image is padded with all zeros, where the smallest side is 800 px and the largest is trimmed at 1000 px. Unless otherwise notes, all training runs used these default parameters.
+
+### Dataset Usage
+We split the the distribution for the dataset for training and validation as shown in *Table 1*. In general, we applied a 80/20 split between training/validation data for each run while also using a label stratification strategy in **Run 4** to distribute the annotations evenly.
+
+<center>
+
+| Name     | Training       | Validation | Strategy  |
+| :-------- | :-------------: | :---------: | :--------: |
+|**Baseline**  | Images: 8032<br>Masks:8044 | Images: 1968<br>Masks: 1968 | 80/20 split<br>Limit: 10k |
+|**Run 1**  | Images: 36596<br>Masks: 267842| Images: 9029<br>Masks: 65573 | 80/20 split |
+|**Run 2**  | Images: 36596<br>Masks: 267842| Images: 9029<br>Masks: 65573 | 80/20 split |
+|**Run 3**  | Images: 45418<br>Masks: 266732| Images: 33715<br>Masks: 66683| 80/20 split<br>Stratified |
+
+</center>
+
+### Training Summary 
+
+We adopted the general transfer-learning approach for training Mask R-CNN on our custom dataset. The pre-trained COCO Dataset weights for Mask R-CNN were used as the starting weights during training of each run. We experimented with additional methodologies to improve better model accuracy as discussed in this section below. Training was completed on an NVIDIA GTX 1070GT (8 GB) graphics card.
+
+### Data Augmentation
+Since the iMaterialist dataset is fairly rich with high quality fine-grained annotations, we did not rely heavily on augmentation to improve the accuracy of our model. The general strategy was to train the 'head' layers of Mask R-CNN without any data augmentation and then to fine-tune the model by training all layers with data augmentation. The following few augmentation tasks were applied at random to the image dataset:
+
+* Vertical Flip
+* Horizontal Flip
+* Random Crops (0-10%)
+* Gaussion Blur (sigma=0-0.5) applied to only 50% images
+* Contrast Normalization (0.75-1.5)
+* Additive Gaussian Noise
+* Brighten/Darken Images
+* Affine Transformations (Scale(0.5.15), Rotate (-45,45), Translate(-0.2, 0.2), Shear(-8,8))
+
+Data augmentation tasks were only applied to 80% of the total training batch size.
+
+### Hyper-parameters tuning
+Mask R-CNN provides a variety hyper-parameters which can be tuned to achieve better accuracy when training on custom datasets. While the list of parameters is fairly extensive, we only tuned a few parameters based on our general understanding of the Mask R-CNN framework.
+
+We set up a baseline run with all default hyper-parameters similar to the COCO dataset training task. The Batch Size was kept limited to 1-2 in each run to limit memory outages when training the vast set of images in our dataset. In all runs, we utilized the SGD optimizer for training with a variable learning rate strategy based on number of epochs as detailed in the table below. We also modified the backbone of the Mask R-CNN to 'resnet50' from the default 'resnet101' to avoid memory outages during training.
+
+For the baseline run and Run 1, we trained only the 'head' layers of the Mask R-CNN which corresponds to the Fully Connected Layers used for object detection and classification. Only, in Runs 2 and 3, we further fine tuned the model by training all layers after training the 'head' layers with an augmented dataset. Finally, only in Run 3 did we truly train the model on the entire dataset, in all other runs the steps / epoch were limited to 1000. 
+
+
+| Name     | LR       | Batch Size | Epochs  | Steps/Epoch | Layers | Augmentation  |
+| :--------| :------: | :--------: | :-----: | :---------: | :----: | :-----------: |
+|**Baseline**| 1e-3   |		 1	   |	1	 | 	  1000     |  head  |      ---      |
+|**Run 1**| 1e-3   |		 1	   |	20	 | 	  1000     |  head  |      ---      |
+|**Run 2**| 1e-3   |		 1	   |	20	 | 	  1000     |  head  |      ---      |
+|**Run 2**| 1e-4   |		 1	   |	20	 | 	  1000     |  all   |      yes      |
+|**Run 2**| 1e-5   |		 1	   |	20	 | 	  1000     |  all   |      yes      |
+|**Run 3**| 1e-3   |		 2	   |	5	 | 	  22709    |  head  |      ----     |
+|**Run 3**| 1e-4   |		 2	   |	5	 | 	  22709    |  all   |      yes      |
+
+
+### Results & Evaluation
+
+The instance segmentation results on four randomly chosen images from the iMaterialist dataset is shown in Fig xx. The network delivered generally acceptable results with the training strategies detailed above with the highest model accuracies reported on Run 3 when the network was trained on the entire dataset.
+
+## Training History
+
+The figures below describe the training losses for Runs 1-3. The baseline run was run for a single epoch hence we did not include the training history for that run. For all the other three runs, we see a gradual improvement in training losses with each successive epoch. The best model from each run was chosen from the history by looking at the lowest validation loss across all epochs. In all three runs, we notice the training losses start to plateau at different points in the training cycle.
+
+Run 2 had the most number of epochs during the training cycle and we see the training losses improve only marginally after Epoch#20. It is important to point our here that during Run 2, the model was trained with augmented dataset with all layers set to trainable after Epoch # 20. This re-affirms our claim made above that augmentation is expected to have very little impact in improving the model accuracy after a certain point.
+
+<p align="center">
+    <img src="images/Run1_losses.png" width="400" height="400" title="Run 1"/>
+    <img src="images/Run2_losses.png" width="400" height="400" title="Run 2"/> 
+</p>
+<p align="center">
+    <img src="images/Run3_losses.png" width="400" height="400" title="Run 3"/> 
+</p>
+
+<br>
+<center>
+
+**Figure 18:** (L-R) Training Losses for Run 1,2 and 3<br>
+*NOTE: Run 3 crashed after Epoch#7 and was never resumed*
+</center>
+<br>
+
+### Evaluation Metrics
+Our common approach to evaluate instance segmentation performance is average precision (AP) over all possible classes under a certain Intersection-over-Union (IoU) threshold. 
+
+The value for IoU threshold is referenced from MS COCO dataset evaluation metrics[13] with fixed IoU thresholds as 0.50 (*AP.50*), 0.75(*AP.75*) as well as the average AP value over [0.50, 0.95] with increment of 0.05 (*AP*).
+
+We consult results from Facebook and Matterport[12] evaludated on the MS COCO dataset as benchmarks. Evaluation metrics were calculated for each run by selecting the model with lowest validation losses and calculating the metrics on batch of 100 random images from the validation dataset used for training during the respective runs. The results are organized in ***Table 3*** below
+
+<br>
+<center>
+
+|      	     | Dataset  | Classes    | AP      | AP.50       | AP.75  |   Training Time |
+| :--------  | :------: | :--------: | :-----: | :---------: | :----: | :----------:	|
+|**Facebook**|  COCO    |    80      |  37.1   |    60.0     |   39.4 | 		---	|
+|**Matterport**|  COCO    |    80      |  35.1   |    59.4     |   36.5 |	---	|
+|**Baseline**|  iMaterialist    |    46      |  11.9   |   20.8     |   13.2 | 15 mins	|
+|**Run 1**|  iMaterialist    |    46      |  17.0  |   30.3     |   17.5|  3 hours	|
+|**Run 2**|  iMaterialist    |    46      |  22.4  |   38.8     |   22.6|  11 hours | 
+|**Run 3**|  iMaterialist    |    46      |  30.6  |   51.3    |   31.8|   45 hours | 
+
+
+**Table 3:** Evaluation metrics comparison of Mask R-CNN framework with multiple implementations and multiple datasets
+</center>
+<br>
+
+Our results show that model trained on Run 3 (entire dataset + fine-tuning + augmentation) achieves comparable results to Mask R-CNN networks trained on the MS COCO dataset when evaluated over a limited batch of test images. The table is included here to demonstrate the improvement in evaluation metrics for our network with each run and figures reported on similar tasks on other datasets. However, as mentioned before the quality and category of classes in MS COCO versus the iMaterialist dataset are significantly different hence it is not a fair comparison to start with.  We believe that model accuracy can be further improved through hyper-parameters tuning and better stratification strategy for splitting the dataset for training and validation. 
+
+### Sample Results
+We added four examples of model predictions from Run 3 on random images picked from the dataset. The model seems to do a good job at detecting primary clothing apparels including dress, pants, shoes, tops, etc. There are occasions when the predictions do not match the ground truth, for example in the top left image, an area of the scarf is detected as a watch, in the top right image the shirt and pants combination is detected as a dress instead of two separate apparels. The confusion matrix of predictions is further discussed below using a single prediction image as an example. In general, we observe that the model is good with detecting objects with no overlap with other objects e.g. shoes, pants, hats, glasses, etc but does a worse job when overlaps are involved, e.g. shirts, sleeves, dresses, etc.
+
+<p align="center">
+    <img src="images/samples_predictions.jpg" height="800"/>
+</p>
+
+<center>
+
+**Figure 18:** Sample instance segmentation results in 46 classes.
+</center>
+<br>
+
+Consider the image below which was taken from the dataset and run through our model to provide detected predictions. The masks are presented as molded overlays where the green outlines represent the ground truth masks and the red outlines represent the predicted masks. We notice that in most instances the ground truth and predictions align fairly. There are also instances where the model predicted what appears to be a bag between the two persons but is clearly a pattern from the background. The precision-recall curve for the same image and the confusion matrix also show that the model detected the objects with good accuracy in this particular instance.
+
+<p align="center">
+    <img src="images/sample_prediction1.png" width="400" height="450"/>
+    <img src="images/sample_precision_recall1.png" width="400" height="400"/>
+</p>
+
+<p align="center">
+    <img src="images/sample_confmatrix1.png" width="600" height="600"/>
+</p>
+
+<center>
+**Figure 18:** (L)Sample image with Ground Truth and Predictions, (R) Precision-Recall Curve<br>
+(Bottom) Confusion Matri
+
+</center>
+
+<br>
+
+We also ran predictions on a real-world image the results of which are included below.
+
+<p align="center">
+    <img src="images/group_predictions.jpg" width="800" height="400"/>
+</p>
+<br>
+<center>
+
+**Figure 19:** Model predictions on a real-world image
+</center>
+<br>
 
 <a name=sec5></a>
 ## 5. Other Models
