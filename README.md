@@ -442,16 +442,16 @@ Our common approach to evaluate instance segmentation performance is average pre
 
 The value for IoU threshold is referenced from MS COCO dataset evaluation metrics[13] with fixed IoU thresholds as 0.50 (*AP.50*), 0.75(*AP.75*) as well as the average AP value over [0.50, 0.95] with increment of 0.05 (*AP*).
 
-We consulte results from Facebook and Matterport[12] evaludated on the MS COCO dataset as benchmarks. Evaluation metrics were calculated for each run by selecting the model with lowest validation losses and calculating the metrics on batch of 100 random images from the validation dataset used for training during the respective runs. The results are organizd in ***Table 3*** below
+We consult results from Facebook and Matterport[12] evaludated on the MS COCO dataset as benchmarks. Evaluation metrics were calculated for each run by selecting the model with lowest validation losses and calculating the metrics on batch of 100 random images from the validation dataset used for training during the respective runs. The results are organized in ***Table 3*** below
 
-|      	     | Dataset  | Classes    | AP      | AP.50       | AP.75  | 
-| :--------  | :------: | :--------: | :-----: | :---------: | :----: | 
-|**Facebook**|  COCO    |    80      |  37.1   |    60.0     |   39.4 |
-|**Matterport**|  COCO    |    80      |  35.1   |    59.4     |   36.5 |	
-|**Baseline**|  iMaterialist    |    46      |  11.9   |   20.8     |   13.2 |
-|**Run 1**|  iMaterialist    |    46      |  17.0  |   30.3     |   17.5|
-|**Run 2**|  iMaterialist    |    46      |  22.4  |   38.8     |   22.6|
-|**Run 3**|  iMaterialist    |    46      |  30.6  |   51.3    |   31.8|
+|      	     | Dataset  | Classes    | AP      | AP.50       | AP.75  |   Training Time |
+| :--------  | :------: | :--------: | :-----: | :---------: | :----: | :----------:	|
+|**Facebook**|  COCO    |    80      |  37.1   |    60.0     |   39.4 | 		---	|
+|**Matterport**|  COCO    |    80      |  35.1   |    59.4     |   36.5 |	---	|
+|**Baseline**|  iMaterialist    |    46      |  11.9   |   20.8     |   13.2 | 15 mins	|
+|**Run 1**|  iMaterialist    |    46      |  17.0  |   30.3     |   17.5|  3 hours	|
+|**Run 2**|  iMaterialist    |    46      |  22.4  |   38.8     |   22.6|  11 hours | 
+|**Run 3**|  iMaterialist    |    46      |  30.6  |   51.3    |   31.8|   45 hours | 
 
 <br>
 <center>
