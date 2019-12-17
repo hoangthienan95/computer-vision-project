@@ -36,7 +36,11 @@ Instance segmentation is the task of identifying object outlines at the pixel le
 <br>
 
 
-![](images/compare_computer_vision_tasks.png)
+<center>
+<p float="center">
+  <img src="images/compare_computer_vision_tasks.png" width="700"/> 
+</p>
+
 **Figure 1**: Types of Object detection and segmenation <a href=http://cs231n.github.io/transfer-learning>(http://cs231n.github.io/transfer-learning)</a> <br>
 </center>
 
@@ -62,11 +66,14 @@ Mask R-CNN is the evolution of not a segmentation architecture, but rather the R
 During the evolution of R-CNN, FaceBook Research published both the DeepMask and SharpMask architectures making them the start-o-the-art at that time.  Mask R-CNN became the new standard after its implementation in 2018.
 
 <br>
+
 <center>
-  
-![](images/Mask_RCNN_evolution.png)
-**Figure 2**: Mask R-CNN is an iterative evolution of the original R-CNN structure.  YOLACT has recently been developed adding real-time inference to instance segmentaiton tasks.
+<p float="center">
+  <img src="images/Mask_RCNN_evolution.png" width="700"/> <br>
+  **Figure 2**: Mask R-CNN is an iterative evolution of the original R-CNN structure.  YOLACT has recently been developed adding real-time inference to instance segmentaiton tasks.
+</p>
 </center>
+
 <br>
 
 ### Mask R-CNN Architecture
@@ -77,16 +84,19 @@ The following figure shows the complete Mask R-CNN structure with the Faster R-C
 Mask R-CNN contributes to the second stage of this process by creating masks from the Faster R-CNN's Regional Proposal Outputs.
 
 <br>
+
+
+
 <center>
-
 **Mask R-CNN Architecture**
-
-![](images/Mask_RCNN_structure.png)
-<font size="-2">
-**Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
+<p float="center">
+  <img src="images/Mask_RCNN_structure.png" width="700"/> <br>
+  **Figure 3**: Mask R-CNN adds segmentation by inserting a process to analyze Faster R-CNN's proposed regions of interest. <br>
 (Source image from <a href=https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272>https://medium.com/@jonathan_hui/image-segmentation-with-mask-r-cnn-ebe6d793272</a>)
-</font>
+
+</p>
 </center>
+
 <br>
 
 ###Network Components
@@ -110,33 +120,17 @@ Mask R-CNN contributes to the second stage of this process by creating masks fro
 Figure 4 depicts the pyramid structure of a CNN network.  Each layer on the left side of the image is convolved reducing the dimensions of the image while increasing its depth.  This has the effect of capturing spatial features of the image while losing surface details.  The left side of the structure leading up to the encoding can be referred to as a convolutional base.
 
 <br>
-<center>
 
-![](images/pyramid.png) <br>
-**Figure 4**: The encoder part of a pyramid network where each level in the pyramid is a <br> convolution of the previous level increasing the depth but decreasing the x/y dimensions.
+<center>
+<p float="center">
+  <img src="images/pyramid.png" width="500"/> <br>
+  **Figure 4**: The encoder part of a pyramid network where each level in the pyramid is a <br> convolution of the previous level increasing the depth but decreasing the x/y dimensions.
+</p>
 </center>
-<br>
+
 
 The convolutional base is refrred to as a backbone when it is imported as a pre-trained network (eg, ResNet50, ResNet101, MobileNet, VGG, etc). These are networks that are pre-trained on a large catalog of images.  These networks can be imported with only the left hald (encoder) part of their network allowing the right side (decoder) to be trained using a custom or different architecture.  
 
-
-
-*START proposed removal* <br>
----
-If you are unfamiliar with the details of the convolutional layers, refer to the [Stanford cs231n class course notes](http://cs231n.github.io/convolutional-networks/), with the demo below. Essentially, each "feature map" is constructed by three convolutional filters. The visualization below iterates over the output activations (green), and shows that each element is computed by elementwise multiplying the highlighted input (blue) with the filter (red), summing it up, and then offsetting the result by the bias. Since we have 2 filters (of size 3x3), our output are 2 feature maps. 
-
-<br>
-<center>
-
-![](images/convolutional_demo.gif) <br>
-**Figure 5**: Example of how a convolution is calculated.
-</center>
-<br>
-
-The later convolutional layers generate smaller feature maps yet generate more of them to capture more information. Passing through the backbone network, the image is converted from variable size images to a feature map of shape 32x32x2048
-
-*END proposed removal* <br>
----
 
 ### Feature Pyramid Network
 
@@ -144,41 +138,28 @@ The main purpose of the encoder is to construct feature maps to extract features
 
 We can think of the convolutional base as constructing a pyramid of feature maps (feature pyramid).
 
-<br>
-<center>
 
-![](images/pyramid2.png) <br>
-**Figure 6:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image. <br>
-<a href=https://arxiv.org/pdf/1612.03144.pdf>https://arxiv.org/pdf/1612.03144.pdf</a>
+
+<center>
+<p float="center">
+  <img src="images/pyramid2.png" width="500"/> <br>
+  **Figure 6:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image. <br>
+<a href=https://arxiv.org/pdf/1612.03144.pdf>https://arxiv.org/pdf/1612.03144.pdf</a></p>
 </center>
-<br>
 
 
 However, computer vision tasks using only the high level feature maps will suffer in performance for small objects, while the low-level feature maps are not effective for accurate object detection. The feature pyramid network (FPN) takes the feature maps from the backbone and improves the feature extraction by having another pyramid that takes the high level features from the first pyramid and passes them down to lower layers. By doing so, it allows features at every level to access to both lower and higher level features. The conceptual schematic of FPN is below.
 
-<br>
-<center>
 
-![](images/pyramid3.png) <br>
-**Figure 7:** Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.
+<center>
+<p float="center">
+  <img src="images/pyramid3.png" width="500"/> <br>
+  **Figure 7:** Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.>
+  </p>
 </center>
-<br>
 
 The second pyramid consists of layers that are upsampled using the encoded layer of the first pyramid.  The reconstructed layers are semantic strong but the locations of objects are not precise after all the downsampling and upsampling. Therefore, we concatenate feature maps of similar size from the first pyramid to the second pyramid on the right to help the detector to predict the location better. It also acts as skip connections to make training faster.
 
-*START proposed removal* <br>
----
-Below are the detailed layers for the FPN. For the top-down pathway's M5 layer for example, we apply a 1x1 convolution filter and upsample the feature tensor C5 in the bottom-up pyramid using nearest neighbors upsampling, add the result and the corresponding feature map of the same size (C4) together element-wise. Finally, we apply a 3x3 convolution to the merged layer to make them smooth out and "blend" together, reducing the aliasing effect when merged.
-
-<br>
-<center>
-
-![](images/fpn_3.png) <br>
-**Figure 8:** 
-</center>
-<br>
-*END proposed removal* <br>
----
 
 ### Region Proposal Network
 
@@ -188,14 +169,14 @@ The region proposal network (RPN) receives the feature maps from the various lev
 Because scanning each possible region in an image would be computationally expensive, the image is broken down into prescribed regions which are scanned.  The prescribed regions that the RPN scans over are called anchors.
 Anchors are boxes distributed over the image area. In the Mask-RCNN implementation, **there are about 200k anchors of different sizes and aspect ratios**. Here, we are just showing one anchor size. Also, **we are showing the anchors on the image, while in practice, the anchors are regions on the feature maps**.This allows the RPN to reuse the extracted features efficiently and avoid duplicate calculations.
 
-<br>
-<center>
 
-![](images/anchors.png) <br>
-**Figure 9:** An example of anchors of one size in an image. <br>
-<a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46>https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
+<center>
+<p float="center">
+  <img src="images/anchors.png" width="400"/> <br>
+  **Figure 9:** An example of anchors of one size in an image. <br>
+	<a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46>https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
+</p>
 </center>
-<br>
 
 
 #### What does a region proposal consist of?
@@ -205,13 +186,14 @@ For each anchor, a series of boxes of different size and aspect ratio are create
 
 The diagram below shows the 8 × 8 feature maps with a 3 × 3 filter, and it outputs a total of 8 × 8 × 3 ROIs (for k = 3). The right side diagram demonstrates the 3 proposals made by a single location.
 
-<br>
-<center>
 
-![](images/rpn_1.jpeg) <br>
-**Figure 10** : Regions of interest for each point in a feature mapping 
+<center>
+<p float="center">
+  <img src="images/rpn_1.jpeg" width="500"/> <br>
+  **Figure 10** : Regions of interest for each point in a feature mapping 
+</p>
 </center>
-<br>
+
 
 #### Region proposals for each anchor of different sizes and aspect ratios
 
@@ -219,44 +201,39 @@ To summarize, Mask-RCNN's RPN component uses 9 anchor boxes: 3 different scales 
 
 Using 9 anchors per location, it generates 2 × 9 objectness scores and 4 × 9 coordinates per location. The outputs are **regions of interests (ROI)** 
 
-<br>
+
 <center>
-
-![](images/rpn_2.png) <br>
-**Figure 11:** Calculation of scores and coordinates for each anchor. <br>
+<p float="center">
+  <img src="images/rpn_2.png" width="500"/> <br>
+  **Figure 11:** Calculation of scores and coordinates for each anchor. <br>
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
+</p>
 </center>
-<br>
-
-
 
 #### RPN architecture
 The regression task for bounding box and classification task for "has object or not" can be achieved by standard convolutional layers, followed by two fully connected heads: one for bounding box regression and the other for classification.  Figure 12 depicts the Region Proposal Network on the left and how it creates proposed regions with bounding boxes and scores for each box.  Note that only the last layers of the Feature Pyramid is evaluated.
 
-<br>
+
 <center>
-
-![](images/rpn_3.jpeg) <br>
-**Figure 12:** The RPN uses scores and coordinates to determine classes and bounding boxes. <br>
+<p float="center">
+  <img src="images/rpn_3.jpeg" width="700"/> <br>
+ **Figure 12:** The RPN uses scores and coordinates to determine classes and bounding boxes. <br>
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
+</p>
 </center>
-<br>
-
 
 #### Connecting RPN and FPN
 
 Once proposed regions are generated, each is evaluated for the possible existence of an object.  Once these are selected, respective regions from the other pyramid scale levels are selected that best represent the object based on its size/scale.  The result is a composite feature map with different regions being patches from different-scale layers of the top-down feature pyramid.
 
-<br>
+
 <center>
-
-![](images/RPN_FPN.jpeg) <br>
-**Figure 13:** Mask R-CNN inserts an ROI Pooling layer in the model <br> before classification and bounding boxes are calculated. <br>
+<p float="center">
+  <img src="images/RPN_FPN.jpeg" width="700"/> <br>
+ **Figure 13:** Mask R-CNN inserts an ROI Pooling layer in the model <br> before classification and bounding boxes are calculated. <br>
 <a href=https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c>https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c</a>
+</p>
 </center>
-<br>
-
-
 
 The formula to pick the feature maps is based on the width w and height h of the ROI.
 
@@ -477,7 +454,7 @@ Our results show that model trained on Run 3 (entire dataset + fine-tuning + aug
 We added four examples of model predictions from Run 3 on random images picked from the dataset. The model seems to do a good job at detecting primary clothing apparels including dress, pants, shoes, tops, etc. There are occasions when the predictions do not match the ground truth, for example in the top left image, an area of the scarf is detected as a watch, in the top right image the shirt and pants combination is detected as a dress instead of two separate apparels. The confusion matrix of predictions is further discussed below using a single prediction image as an example. In general, we observe that the model is good with detecting objects with no overlap with other objects e.g. shoes, pants, hats, glasses, etc but does a worse job when overlaps are involved, e.g. shirts, sleeves, dresses, etc.
 
 <p align="center">
-    <img src="images/samples_predictions.jpg" height="800"/>
+    <img src="images/samples_predictions.jpg" height="600"/>
 </p>
 
 <center>
@@ -489,17 +466,17 @@ We added four examples of model predictions from Run 3 on random images picked f
 Consider the image below which was taken from the dataset and run through our model to provide detected predictions. The masks are presented as molded overlays where the green outlines represent the ground truth masks and the red outlines represent the predicted masks. We notice that in most instances the ground truth and predictions align fairly. There are also instances where the model predicted what appears to be a bag between the two persons but is clearly a pattern from the background. The precision-recall curve for the same image and the confusion matrix also show that the model detected the objects with good accuracy in this particular instance.
 
 <p align="center">
-    <img src="images/sample_prediction1.png" width="400" height="450"/>
-    <img src="images/sample_precision_recall1.png" width="400" height="400"/>
+    <img src="images/sample_prediction1.png" width="400" />
+    <img src="images/sample_precision_recall1.png" width="400" align="top"/>
 </p>
 
 <p align="center">
-    <img src="images/sample_confmatrix1.png" width="600" height="600"/>
+    <img src="images/sample_confmatrix1.png" width="700" height="600"/>
 </p>
 
 <center>
 **Figure 18:** (L)Sample image with Ground Truth and Predictions, (R) Precision-Recall Curve<br>
-(Bottom) Confusion Matri
+(Bottom) Confusion Matrix
 
 </center>
 
