@@ -249,11 +249,34 @@ The formula to pick the feature maps is based on the width w and height h of the
 
 `k0` is a user-defined parameter (default: 4), and `k` is the layer in the FPN to be used for the feature patch. So if `k = 3`, we select P3 for the patch for that ROI.
 
+The RPN generates two outputs for each anchor:
 
+Anchor Class: One of two classes: foreground or background. The FG class implies that there is likely an object in that box.
 
+Bounding Box Refinement: A foreground anchor (also called positive anchor) might not be centered perfectly over the object. So the RPN estimates a delta (% change in x, y, width, height) to refine the anchor box to fit the object better.
+
+Using the RPN predictions, we pick the top anchors that are likely to contain objects and refine their location and size. If several anchors overlap too much, we keep the one with the highest foreground score and discard the rest.
 
 #### ROI Align
-The next phase is the contribution made my the Mask R-CNN architecture.  Chosen feature maps with possible objects are further refined in the ROI pooling layer.  The results are sent down 3 output branches of the network:
+
+In order to do classification and instance segmentation, we would need to feed the ROIs that likely to have an object (foreground class) into the two output heads . 
+
+One head is a fully connected layer whose outputs are 1) the four bounding box coordinates for the object and 2) probability prediction for all the classes in the dataset. The class that the object belongs to will be the one with highest probability. The other head is a fully convolutional layer that outputs one mask for each object.
+
+However, classifiers do not handle variable input size well, therefore we need to apply the ROI Align step to make all inputs to the output heads the same size. ROI Align was introduced by authors of Mask-RCNN paper as an improvement of ROI Pooling. In ROI Pooling, for every region of interest from the input list, it takes a section of the input feature map that corresponds to it and scales it to some pre-defined size. The steps for scaling are:
+
+1. Dividing the region proposal into equal-sized sections (the number of which is the same as the dimension of the output)
+1. Finding the largest value in each section
+1. Copying these max values to the output buffer
+
+An illustration of ROI Pooling is below:
+![](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
+
+In ROI Pooling, the warping is digitalized (top left diagram below): the cell boundaries of the target feature map are forced to realign with the boundary of the input feature maps. Therefore, each target cells may not be in the same size (bottom left diagram). Mask R-CNN uses ROI Align which does not digitalize the boundary of the cells (top right) and make every target cell to have the same size (bottom right). It also applies interpolation to calculate the feature map values within the cell better. For example, by applying interpolation, the maximum feature value on the top left is changed from 0.8 to 0.88 now.
+
+![](https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png)
+Comparison of ROI Pooling and ROI align. Source: https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png
+
 
 **Output Branches**
 
@@ -535,7 +558,17 @@ Results were poor and required extensive training.  Below is an example after 50
 As YOLACT was published during our initial project, only one stable implementation was available to use to try.  We did not attempt to build our own YOLACT implementation.  We were not successful in getting the model to work
 (<a href=https://github.com/dbolya/yolact>https://github.com/dbolya/yolact</a>)
 
+State of the art approaches to instance segmentation like Mask R-CNN directly builds off of advances in two-stage object detection algorithms like Faster R-CNN. However, these methods focus primarily on performance over speed, which make them unsuitable for real time instance segmentation. YOLACT aims to fill that gap with a fast, one-stage instance segmentation model in the same way that SSD and YOLO fill that gap for object detection.
 
+The slow step for the two stage algorithms is “repooling” features in some region of interests (e.g., via RoIpool/align), and then feed these now localized features to their mask predictor, since this step is inherently sequential.  YOLACT approaches the instance segmentation from a different perspective the forgoes the feature localization/repooling step. YOLACT breaks instance segmentation into two parallel tasks: 1) creating masks over the entire image and 2) determine linear combination coefficients (can be think of as weights) of these masks for each instance to be segmented. At the inference step, for each instance, linearly combine the prototypes using the corresponding predicted coefficients and then crop with a predicted bounding box.
+![](images/YOLACT.png)
+
+YOLACT consists of two branches, the first branch uses an FCN [31] to produce a set of image-sized “prototype masks” that do not depend on any one instance. The second adds an extra head to the object detection branch to predict a vector of “mask coefficients” for each anchor that encode an instance’s representation in the prototype space. Finally, for each instance that survives non-maximal suppression, YOLACT construct a mask for that instance by linearly combining the work of these two branches.
+
+<b>Yolact is the first real-time (> 30 fps) instance segmentation algorithm with competitive results on
+the challenging MS COCO dataset</b>
+
+![](images/YOLACT_speed.png)
 <a name=sec6></a>
 ## 6. Lessons Learned / Improvements
 <a href=#toc>back to table of contents</a><br>
