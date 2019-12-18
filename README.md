@@ -6,6 +6,8 @@ Recently, computer vision applications have attracted significant attention in t
 
 A recent paper describes a system that can take in “in the wild” scene images to generate complementary items recommendations [4]; however, the model training involves inefficient cropping heuristics that fail on certain clothing items, complicated attention mechanisms to detect each item of clothing in an image, and a manually-curated dataset. The authors remark that constructing appropriate ground truth data to learn the notion of compatibility is a significant challenge due to the amount of human effort to label and categorize.
 
+A system to segment out instances clothing items can help automatically create annotated datasets for fashion using only prevalent everyday scene images as input and not the typical product image (white background with usually one item per image). This would help both researchers and consumers keep up with the fast-changing trends. Fashion experts can know what people are wearing together, designers can find out the various styles of garments (the position of pockets, neckline on a shirt/pants) and have crowdsourced creative inspirations at their fingertips.
+
 The effort described in this paper aims to use existing methods to provide a quality instance segmentaiton of fashion items and their attributes using data provided from the 2019 Kaggle iMaterialist [6][7] challenge.
 
 This effort focuses on the implementation of a Mask R-CNN model and covers the major components of this framework that deliver a state-of-the-art semantic segmentation.  The Matterport implementation of Mask R-CNN [12] is used as a supporting framework to implement the model into which the iMaterialist data is loaded and trained.
@@ -79,7 +81,7 @@ During the evolution of R-CNN, FaceBook Research published both the DeepMask and
 
 ### Mask R-CNN Architecture
 The following figure shows the complete Mask R-CNN structure with the Faster R-CNN base separated out.  This shows how Mask R-CNN fits into the R-CNN evolution.  (The evolution before Faster R-CNN is not depicted for understandability.)  The complete Mask R-CNN network (regional convolutional neural network) is a two stage framework: 
-1. Stage 1 scans the image and generates proposals(areas likely to contain an object) using a Regiona Proposal Network. 
+1. Stage 1 scans the image and generates proposals(areas likely to contain an object) using a Regional Proposal Network. 
 2. Stage 2 classifies the proposals and generates bounding boxes and masks.
 
 Mask R-CNN contributes to the second stage of this process by creating masks from the Faster R-CNN's Regional Proposal Outputs.
@@ -98,7 +100,7 @@ Mask R-CNN contributes to the second stage of this process by creating masks fro
 
 <br>
 
-###Network Components
+### Network Components
 1. Convolutionan Network:
 	- Convolutional Base
 	- Feature Pyramid Network (FPN)
@@ -143,7 +145,7 @@ We can think of the convolutional base as constructing a pyramid of feature maps
 **Tradeoff Between Resolution and Semantic Meaning**
 <p float="center">
   <img src="images/pyramid2.png" width="500"/> <br>
-  **Figure 5:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image.<br>
+  <b>Figure 5:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image.</b><br>
 <a href=https://arxiv.org/pdf/1612.03144.pdf>https://arxiv.org/pdf/1612.03144.pdf</a></p>
 </center>
 
@@ -155,7 +157,7 @@ However, computer vision tasks using only the high level feature maps will suffe
 **Skip Connections Between Layers**
 <p float="center">
   <img src="images/pyramid3.png" width="500"/> <br>
-  **Figure 6:** Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.>
+  <b>Figure 6 Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.</b>
   </p>
 </center>
 
@@ -172,11 +174,11 @@ Anchors are boxes distributed over the image area. In the Mask-RCNN implementati
 
 
 <center>
-**The Anchors of a Region Proposal Network**
+
 <p float="center">
   <img src="images/anchors.png" width="400"/> <br>
-  **Figure 7:** An example of anchors of one size in an image. <br>
-	<a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46>https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
+  <b>Figure 7: An example of anchors of one size in an image.</b> <br>
+	<a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46> Source: https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
 </p>
 </center>
 
@@ -190,10 +192,10 @@ The diagram below shows the 8 × 8 feature maps with a 3 × 3 filter, and it out
 
 
 <center>
-**Proposed Regions from Anchors**
+<b>Proposed Regions from Anchors</b>
 <p float="center">
   <img src="images/rpn_1.jpeg" width="500"/> <br>
-  **Figure 8** : Regions of interest for each point in a feature mapping 
+  <b>Figure 8 : Regions of interest for each point in a feature mapping </b> 
 </p>
 </center>
 
@@ -564,7 +566,7 @@ The slow step for the two stage algorithms is “repooling” features in some r
 
 <br>
 <center>
-**YOLACT Architecture**
+<b>YOLACT Architecture</b>
 <p align="center">
     <img src="images/YOLACT.png" width="700"/>
 </p>
@@ -583,7 +585,7 @@ Note: YOLACT++ was published during the completion of this paper improving accua
 
 <br>
 <center>
-**YOLACT Speed and Metrics**
+<b>YOLACT Speed and Metrics</b>
 <p align="center">
     <img src="images/YOLACT_speed.png" width="400"/>
 </p>
