@@ -51,7 +51,7 @@ Semantic segmentation has the goal of classify each pixel into a fixed set of ca
 <a name=sec2></a>
 ## 2. Related Work
 <a href=#toc>back to table of contents</a><br>
-Object detection has become a primary focus of computer vision tasks over recent years.  In 2015, FaceBook Research introduced a viable instance segmentation architecture with DeepMask [13].  Less than a year after publishing DeepMask, the same team published an iterative improvement called SharpMask [14] which addressed many of the DeepMask inaccuracies.  DeepMask and SharpMask did not use skip connections and focused on refining a proposed mask using convolution.  Inference times of the improved SharpMask were ~.8s per frame.  At the same time, the R-CNN family of object detection architectures were under going a series of iterative improvements with the publication of Fast R-CNN and Faster-RCNN.  Although these focused on object detection, they became the precursor to instance segmenation architecture of Mask R-CNN.  By focusing on segmentation first and then classification, DeepMask and SharpMask proved slow to train and predict as well as a high rate of misclassifications.  Mask R-CNN performs the same task as DeepMask and SharpMask but does so in parallel to the classification task improving both speed and accuracy.
+Object detection has become a primary focus of computer vision tasks over recent years.  In 2015, FaceBook Research introduced a viable instance segmentation architecture with DeepMask [13].  Less than a year after publishing DeepMask, the same team published an iterative improvement called SharpMask [14] which addressed many of the DeepMask inaccuracies.  DeepMask and SharpMask did not use skip connections and focused on refining a proposed mask using convolution.  Inference times of the improved SharpMask were ~.8s per frame.  At the same time, the R-CNN family of object detection architectures were undergoing a series of iterative improvements with the publication of Fast R-CNN and Faster-RCNN.  Although these focused on object detection, they became the precursor to instance segmenation architecture of Mask R-CNN in 2018.  By focusing on segmentation first and then classification, DeepMask and SharpMask proved slow to train and predict and had a high rate of misclassifications with ppor quality masking.  Mask R-CNN performs the same task as DeepMask and SharpMask but does calculations in parallel to the classification task improving both speed and accuracy.  By starting the segmentaion algothim on an area of the image where an object has already been detected, the quality improved.
 
 This paper focuses on how Mask R-CNN works and its evolution.
 
@@ -244,7 +244,7 @@ Once proposed regions are generated, each is evaluated for the possible existenc
 The formula to pick the feature maps is based on the width w and height h of the ROI.
 
 <center>
-![](images/rpn_fpn_2.png)
+	 <img src="images/rpn_fpn_2.png" width="200"/> <br>
 </center>
 
 `k0` is a user-defined parameter (default: 4), and `k` is the layer in the FPN to be used for the feature patch. So if `k = 3`, we select P3 for the patch for that ROI.
@@ -269,20 +269,26 @@ However, classifiers do not handle variable input size well, therefore we need t
 1. Finding the largest value in each section
 1. Copying these max values to the output buffer
 
-An illustration of ROI Pooling is below:
-![](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
 
 In ROI Pooling, the warping is digitalized (top left diagram below): the cell boundaries of the target feature map are forced to realign with the boundary of the input feature maps. Therefore, each target cells may not be in the same size (bottom left diagram). Mask R-CNN uses ROI Align which does not digitalize the boundary of the cells (top right) and make every target cell to have the same size (bottom right). It also applies interpolation to calculate the feature map values within the cell better. For example, by applying interpolation, the maximum feature value on the top left is changed from 0.8 to 0.88 now.
 
-![](https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png)
-Comparison of ROI Pooling and ROI align. Source: https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png
+<center>
+**ROI Pooling Example**
+<p float="center">
+  <img src="https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png" width="600"/> <br>
+ **Figure 12:** Comparison of ROI Pooling and ROI align. <br> 
+ Source: <a href="https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png">https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png</a> <br>
+</p>
+</center>
+
+
 
 
 **Output Branches**
 
-1. Classification - The same classification process is done here as is done with Faster R-CNN.  The probability of classification is calculated.
-2. Bounding Box Regression - The bounding boxes are refined using regression
-3. Mask - Each pixels is evaluated for inclusion in a classification mask.  This is process intensive addition to the faster R-CNN process which increases train and inference time.
+1. **Classification** - The same classification process is done here as is done with Faster R-CNN.  The probability of classification is calculated.
+2. **Bounding Box Regression** - The bounding boxes are refined using regression
+3. **Mask** - Each pixels is evaluated for inclusion in a classification mask.  This is process intensive addition to the faster R-CNN process which increases train and inference time.
 
 Each branch produces a unique output.
 
@@ -312,7 +318,7 @@ We started the segmentation task by taking a deep dive into the iMaterialist Dat
 **The iMaterialist Mask Definitions in CSV File**
 <p float="center">
   <img src="images/Dataframe_sample.png" width="800"/> <br>
- **Figure 12:** *(Left)*Sample dataframe from iMaterialist Train CSV file,*(Right)*Corresponding image with annotations overlaid<br>
+ **Figure 13:** *(Left)*Sample dataframe from iMaterialist Train CSV file,*(Right)*Corresponding image with annotations overlaid<br>
 </p>
 </center>
 
@@ -327,7 +333,7 @@ Additionally, the training images reflect a wide distribution of dimensions rang
 <p float="center">
   <img src="images/Categories_distribution.png" width="800"/> 
 </p>
-**Figure 13:** Distribution of annotations per apparel category <br>
+**Figure 14:** Distribution of annotations per apparel category <br>
 </center>
 
 <br>
@@ -337,7 +343,7 @@ As mentioned above, the dataset also consisted about **3201** test images for th
 <p float="center">
   <img src="images/Sample_images.png" width="800"/> 
 </p>
-**Figure 14:** Set of sample images from training dataset with masks overlaid<br>   
+**Figure 15:** Set of sample images from training dataset with masks overlaid<br>   
 </center>
 <br>
 
@@ -369,7 +375,7 @@ Once loaded into the COCO-style format, the images, annotations and bounding box
 </p>
 
 <center>
-**Figure 15:** Set of sample images from training dataset in COCO-style format<br>
+**Figure 16:** Set of sample images from training dataset in COCO-style format<br>
 </center>
 <br>
 
@@ -433,7 +439,7 @@ For the baseline run and Run 1, we trained only the 'head' layers of the Mask R-
 
 ### Results & Evaluation
 
-The instance segmentation results on four randomly chosen images from the iMaterialist dataset is shown in Fig 17. The network delivered generally acceptable results with the training strategies detailed above with the highest model accuracies reported on Run 3 when the network was trained on the entire dataset.
+The instance segmentation results on four randomly chosen images from the iMaterialist dataset is shown in Fig 18. The network delivered generally acceptable results with the training strategies detailed above with the highest model accuracies reported on Run 3 when the network was trained on the entire dataset.
 
 ## Training History
 
@@ -441,6 +447,7 @@ The figures below describe the training losses for Runs 1-3. The baseline run wa
 
 Run 2 had the most number of epochs during the training cycle and we see the training losses improve only marginally after Epoch#20. It is important to point our here that during Run 2, the model was trained with augmented dataset with all layers set to trainable after Epoch # 20. This re-affirms our claim made above that augmentation is expected to have very little impact in improving the model accuracy after a certain point.
 
+<center>
 <p align="center">
     <img src="images/Run1_losses.png" width="400" height="400" title="Run 1"/>
     <img src="images/Run2_losses.png" width="400" height="400" title="Run 2"/> 
@@ -449,10 +456,7 @@ Run 2 had the most number of epochs during the training cycle and we see the tra
     <img src="images/Run3_losses.png" width="400" height="400" title="Run 3"/> 
 </p>
 
-<br>
-<center>
-
-**Figure 16:** (L-R) Training Losses for Run 1,2 and 3<br>
+**Figure 17:** (L-R) Training Losses for Run 1,2 and 3<br>
 *NOTE: Run 3 crashed after Epoch#7 and was never resumed*
 </center>
 <br>
@@ -486,18 +490,18 @@ Our results show that model trained on Run 3 (entire dataset + fine-tuning + aug
 ### Sample Results
 We added four examples of model predictions from Run 3 on random images sampled from the dataset. The model seems to do a good job at detecting primary clothing apparels including dress, pants, shoes, tops, etc. There are occasions when the predictions do not match the ground truth, for example in the top left image, an area of the scarf is detected as a watch, in the top right image the shirt and pants combination is detected as a dress instead of two separate apparels. The confusion matrix of predictions is further discussed below using a single prediction image as an example. In general, we observe that the model is good with detecting objects with no overlap with other objects e.g. shoes, pants, hats, glasses, etc but does a worse job when overlaps are involved, e.g. shirts, sleeves, dresses, etc.
 
+<center>
 <p align="center">
     <img src="images/samples_predictions.jpg" height="600"/>
 </p>
 
-<center>
-
-**Figure 17:** Sample instance segmentation results in 46 classes.
+**Figure 18:** Sample instance segmentation results in 46 classes.
 </center>
 <br>
 
 The image below which was taken from the dataset and run through our model to provide detected predictions. The masks are presented as molded overlays where the green outlines represent the ground truth masks and the red outlines represent the predicted masks. We notice that in most instances the ground truth and predictions align fairly well. There are also instances where the model predicted what appears to be a bag between the two persons but is clearly a pattern from the background. The precision-recall curve for the same image and the confusion matrix support the visual results that model detected the objects with good accuracy in this particular instance.
 
+<center>
 <p align="center">
     <img src="images/sample_prediction1.png" width="400" />
     <img src="images/sample_precision_recall1.png" width="400" align="top"/>
@@ -507,8 +511,7 @@ The image below which was taken from the dataset and run through our model to pr
     <img src="images/sample_confmatrix1.png" width="700" height="600"/>
 </p>
 
-<center>
-**Figure 18:** (L)Sample image with Ground Truth and Predictions, (R) Precision-Recall Curve<br>
+**Figure 19:** (L)Sample image with Ground Truth and Predictions, (R) Precision-Recall Curve<br>
 (Bottom) Confusion Matrix
 
 </center>
@@ -523,7 +526,7 @@ We also ran predictions on a real-world image the results of which are included 
     <img src="images/group_predictions.jpg" />
 </p>
 
-**Figure 19:** Model predictions on a real-world image
+**Figure 20:** Model predictions on a real-world image
 </center>
 <br>
 
@@ -558,14 +561,41 @@ As YOLACT was published during our initial project, only one stable implementati
 State of the art approaches to instance segmentation like Mask R-CNN directly builds off of advances in two-stage object detection algorithms like Faster R-CNN. However, these methods focus primarily on performance over speed, which make them unsuitable for real time instance segmentation. YOLACT aims to fill that gap with a fast, one-stage instance segmentation model in the same way that SSD and YOLO fill that gap for object detection.
 
 The slow step for the two stage algorithms is “repooling” features in some region of interests (e.g., via RoIpool/align), and then feed these now localized features to their mask predictor, since this step is inherently sequential.  YOLACT approaches the instance segmentation from a different perspective the forgoes the feature localization/repooling step. YOLACT breaks instance segmentation into two parallel tasks: 1) creating masks over the entire image and 2) determine linear combination coefficients (can be think of as weights) of these masks for each instance to be segmented. At the inference step, for each instance, linearly combine the prototypes using the corresponding predicted coefficients and then crop with a predicted bounding box.
-![](images/YOLACT.png)
+
+<br>
+<center>
+**YOLACT Architecture**
+<p align="center">
+    <img src="images/YOLACT.png" width="700"/>
+</p>
+
+**Figure 21:** Overview of the YOLACT Architecture
+</center>
+<br>
+
 
 YOLACT consists of two branches, the first branch uses an FCN [31] to produce a set of image-sized “prototype masks” that do not depend on any one instance. The second adds an extra head to the object detection branch to predict a vector of “mask coefficients” for each anchor that encode an instance’s representation in the prototype space. Finally, for each instance that survives non-maximal suppression, YOLACT construct a mask for that instance by linearly combining the work of these two branches.
 
 <b>Yolact is the first real-time (> 30 fps) instance segmentation algorithm with competitive results on
 the challenging MS COCO dataset</b>
 
-![](images/YOLACT_speed.png)
+Note: YOLACT++ was published during the completion of this paper improving accuarcy of the previous iteration.  Times shown below include YOLCAT++; however, an analysis of YOLACT++ is not included here.
+
+<br>
+<center>
+**YOLACT Speed and Metrics**
+<p align="center">
+    <img src="images/YOLACT_speed.png" width="400"/>
+</p>
+
+**Figure 22:** Comparison of relvant instance segemenation architectures.
+</center>
+<br>
+
+
+
+
+
 <a name=sec6></a>
 ## 6. Lessons Learned / Improvements
 <a href=#toc>back to table of contents</a><br>
