@@ -145,7 +145,7 @@ We can think of the convolutional base as constructing a pyramid of feature maps
 **Tradeoff Between Resolution and Semantic Meaning**
 <p float="center">
   <img src="images/pyramid2.png" width="500"/> <br>
-  <b>Figure 5:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image.</b><br>
+  **Figure 5:** Each level of the pyramid decreases its resolution but <br> increases its ability to recognize features (semantic values) of an image.<br>
 <a href=https://arxiv.org/pdf/1612.03144.pdf>https://arxiv.org/pdf/1612.03144.pdf</a></p>
 </center>
 
@@ -157,7 +157,7 @@ However, computer vision tasks using only the high level feature maps will suffe
 **Skip Connections Between Layers**
 <p float="center">
   <img src="images/pyramid3.png" width="500"/> <br>
-  <b>Figure 6 Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.</b>
+  **Figure 6:** Each level of the enocder side of the pyramid shares semantic meaning with the decoder side <br> of the pyramid in order to help form properly formed segmentations in the final image.
   </p>
 </center>
 
@@ -172,15 +172,17 @@ The region proposal network (RPN) receives the feature maps from the various lev
 Because scanning each possible region in an image would be computationally expensive, the image is broken down into prescribed regions which are scanned.  The prescribed regions that the RPN scans over are called anchors.
 Anchors are boxes distributed over the image area. In the Mask-RCNN implementation, **there are about 200k anchors of different sizes and aspect ratios**. Here, we are just showing one anchor size. Also, **we are showing the anchors on the image, while in practice, the anchors are regions on the feature maps**.This allows the RPN to reuse the extracted features efficiently and avoid duplicate calculations.
 
-
+<br>
 <center>
 
 <p float="center">
   <img src="images/anchors.png" width="400"/> <br>
-  <b>Figure 7: An example of anchors of one size in an image.</b> <br>
+  <b>Figure 7:</b> An example of anchors of one size in an image. <br>
 	<a href=https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46> Source: https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46</a>
 </p>
+
 </center>
+<br>
 
 
 #### What does a region proposal consist of?
@@ -190,14 +192,15 @@ For each anchor, a series of boxes of different size and aspect ratio are create
 
 The diagram below shows the 8 × 8 feature maps with a 3 × 3 filter, and it outputs a total of 8 × 8 × 3 ROIs (for k = 3). The right side diagram demonstrates the 3 proposals made by a single location.
 
-
+<br>
 <center>
 <b>Proposed Regions from Anchors</b>
 <p float="center">
   <img src="images/rpn_1.jpeg" width="500"/> <br>
-  <b>Figure 8 : Regions of interest for each point in a feature mapping </b> 
+  <b>Figure 8 :</b> Regions of interest for each point in a feature mapping.
 </p>
 </center>
+<br>
 
 
 #### Region proposals for each anchor of different sizes and aspect ratios
@@ -206,7 +209,7 @@ To summarize, Mask-RCNN's RPN component uses 9 anchor boxes: 3 different scales 
 
 Using 9 anchors per location, it generates 2 × 9 objectness scores and 4 × 9 coordinates per location. The outputs are **regions of interests (ROI)** 
 
-
+<br>
 <center>
 **Evaluating Anchors for Content**
 <p float="center">
@@ -215,11 +218,12 @@ Using 9 anchors per location, it generates 2 × 9 objectness scores and 4 × 9 c
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
 </p>
 </center>
+<br>
 
 #### RPN architecture
 The regression task for bounding box and classification task for "has object or not" can be achieved by standard convolutional layers, followed by two fully connected heads: one for bounding box regression and the other for classification.  Figure 12 depicts the Region Proposal Network on the left and how it creates proposed regions with bounding boxes and scores for each box.  Note that only the last layers of the Feature Pyramid is evaluated.
 
-
+<br>
 <center>
 **Region Proposal Architecture**
 <p float="center">
@@ -228,12 +232,13 @@ The regression task for bounding box and classification task for "has object or 
 <a href=https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9>https://medium.com/@jonathan_hui/what-do-we-learn-from-region-based-object-detectors-faster-r-cnn-r-fcn-fpn-7e354377a7c9</a>
 </p>
 </center>
+<br>
 
 #### Connecting RPN and FPN
 
 Once proposed regions are generated, each is evaluated for the possible existence of an object.  Once these are selected, respective regions from the other pyramid scale levels are selected that best represent the object based on its size/scale.  The result is a composite feature map with different regions being patches from different-scale layers of the top-down feature pyramid.
 
-
+<br>
 <center>
 **How RPN Fits into the Overall Fast R-CNN Architecture**
 <p float="center">
@@ -242,6 +247,7 @@ Once proposed regions are generated, each is evaluated for the possible existenc
 <a href=https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c>https://medium.com/@jonathan_hui/understanding-feature-pyramid-networks-for-object-detection-fpn-45b227b9106c</a>
 </p>
 </center>
+<br>
 
 The formula to pick the feature maps is based on the width w and height h of the ROI.
 
@@ -259,6 +265,7 @@ Bounding Box Refinement: A foreground anchor (also called positive anchor) might
 
 Using the RPN predictions, we pick the top anchors that are likely to contain objects and refine their location and size. If several anchors overlap too much, we keep the one with the highest foreground score and discard the rest.
 
+<br>
 #### ROI Align
 
 In order to do classification and instance segmentation, we would need to feed the ROIs that likely to have an object (foreground class) into the two output heads . 
@@ -274,6 +281,7 @@ However, classifiers do not handle variable input size well, therefore we need t
 
 In ROI Pooling, the warping is digitalized (top left diagram below): the cell boundaries of the target feature map are forced to realign with the boundary of the input feature maps. Therefore, each target cells may not be in the same size (bottom left diagram). Mask R-CNN uses ROI Align which does not digitalize the boundary of the cells (top right) and make every target cell to have the same size (bottom right). It also applies interpolation to calculate the feature map values within the cell better. For example, by applying interpolation, the maximum feature value on the top left is changed from 0.8 to 0.88 now.
 
+<br>
 <center>
 **ROI Pooling Example**
 <p float="center">
@@ -282,7 +290,7 @@ In ROI Pooling, the warping is digitalized (top left diagram below): the cell bo
  Source: <a href="https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png">https://miro.medium.com/max/1496/1*en2vHrpgp0n3fLi2QKJOKA.png</a> <br>
 </p>
 </center>
-
+<br>
 
 
 
@@ -316,6 +324,7 @@ The iMaterialist Dataset was presented as an open online challenge on Kaggle. Th
 ### Exploratory Data Analysis
 We started the segmentation task by taking a deep dive into the iMaterialist Dataset using the base set of files provided with the challenge. The crux of the information is provided in the CSV database file listing out the pixel-wise annotations for each image.
 
+<br>
 <center>
 **The iMaterialist Mask Definitions in CSV File**
 <p float="center">
@@ -323,7 +332,7 @@ We started the segmentation task by taking a deep dive into the iMaterialist Dat
  **Figure 13:** *(Left)*Sample dataframe from iMaterialist Train CSV file,*(Right)*Corresponding image with annotations overlaid<br>
 </p>
 </center>
-
+<br>
 
 The database consists of **45625** unique training image filenames with a total of **333415** pixel-wise annotations. The maximum number of ground truth annotations for a given image is **74** with the average number of annotations per image being roughly around **7.3**.
 
